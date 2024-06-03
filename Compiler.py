@@ -76,7 +76,6 @@ class Compiler:
                             value = self.builder.srem(left_value,right_value)
                         case '^':
                             pass
-                    print(value)
                     return value, dtype
                 elif isinstance(right_type, ir.FloatType) and isinstance(left_type, ir.FloatType):
                     dtype = self.type_map['float']
@@ -115,11 +114,13 @@ class Compiler:
         value, dtype = self.resolve_value(value)
         
         if self.env.lookup(name) is None:
-            ptr =self.builder.alloca(dtype)
+            ptr = self.builder.alloca(dtype)
             self.builder.store(value,ptr)
-            self.env.define(name,value,dtype)
+            print(name,"\n" ,ptr,"\n",dtype, "\n")
+            self.env.define(name,ptr,dtype)
         else:
-            ptr, _ = self.env.lookup(dtype)
+            print(name,"\n")
+            ptr, _ = self.env.lookup(name)
             self.builder.store(value, ptr)
             
     def visit_asingment(self, node: ExprParser.AsingmentContext):
@@ -128,7 +129,7 @@ class Compiler:
         
         value, dtype = self.resolve_value(value)
 
-        ptr, _ = self.env.lookup(dtype)
+        ptr, _ = self.env.lookup(name)
         self.builder.store(value, ptr)
         
         
@@ -145,8 +146,6 @@ class Compiler:
         elif isinstance(node, ExprParser.IdContext):
             node:ExprParser.IdContext = node
             ptr, dtype = self.env.lookup(node.getChild(0).getText())
-            print(type(ptr))
-            print(type(dtype))
             return self.builder.load(ptr), dtype
         elif isinstance(node, ExprParser.ExprContext):
             return self.visit_expr(node)

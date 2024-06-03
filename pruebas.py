@@ -23,4 +23,6 @@ b = ir.Constant(int32_type, 20)
 
 # Perform addition
 sum_value :ir.Instruction = builder.add(a, b, name="my_addition")
-print(a)
+print(type(sum_value))
+
+print(sum_value)
